@@ -16,10 +16,13 @@ def get_df():
 def get_stream_now(df=None):
     if df is None:
         df = get_df()
-    try:
-        stream = df[df.index == datetime.now().date()]["Stream"]
-    except KeyError:
+
+    stream = df[df.index == datetime.now().date()]["Stream"]
+    if not len(stream):
         stream = "NOSTREAM"
+    else:
+        stream = stream[0]
+    
     return stream
     
 def get_country_upcoming(df=None):
