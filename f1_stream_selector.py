@@ -88,7 +88,7 @@ class MyServer(BaseHTTPRequestHandler):
             circuit = get_circuit_upcoming(df)
             time_str = get_time_until_upcoming(df)
             self.wfile.write(bytes("<body>", "utf-8"))
-            self.wfile.write(bytes(f"<p>Das kommende Rennen findet {time_str} in {circuit}, {country} statt.</p>", "utf-8"))
+            self.wfile.write(bytes(f"<p>Das kommende Rennen findet {time_str} in {country} statt.</p>", "utf-8"))
             self.wfile.write(bytes("</body></html>", "utf-8"))
 
         else:
