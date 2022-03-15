@@ -2,43 +2,43 @@ import pandas as pd
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import time
 import yaml
+from datetime import datetime
 
 
-def get_stream_today():
-    # load csv
-    df = pd.read_csv("streams.csv", index_col="Date",
-                     parse_dates=True, dayfirst=True)
-    df.index = pd.to_datetime(df.index)
-    # find exact date in df
+def get_df():
+    df = pd.read_csv("streams.csv", index_col="Date", parse_dates=True, dayfirst=True)
+    df.index = df.index.date
+    df = df.sort_index()
+    df = df[~df.index.duplicated(keep='last')]
+    return df
+
+
+def get_stream_now(df=None):
+    if df is None:
+        df = get_df()
     try:
-        stream = df.loc[pd.to_datetime('today').normalize().date().isoformat()]["Stream"]
-        return stream
+        stream = df[df.index == datetime.now().date()]["Stream"]
     except KeyError:
-        return "NOSTREAM"
+        stream = "NOSTREAM"
+    return stream
     
-def get_country_today():
-    # load csv
-    df = pd.read_csv("streams.csv", index_col="Date",
-                     parse_dates=True, dayfirst=True)
-    df.index = pd.to_datetime(df.index)
-    # find exact date in df
+def get_country_upcoming(df=None):
+    if df is None:
+        df = get_df()
     try:
-        stream = df.loc[pd.to_datetime('today').normalize().date().isoformat()]["Country"]
-        return stream
+        country = df[df.index >= datetime.now().date()].iloc[0]["Country"]
     except KeyError:
-        return "NOCOUNTRY"
+        country = "NOCOUNTRY"
+    return country
 
-def get_circuit_today():
-    # load csv
-    df = pd.read_csv("streams.csv", index_col="Date",
-                     parse_dates=True, dayfirst=True)
-    df.index = pd.to_datetime(df.index)
-    # find exact date in df
+def get_circuit_upcoming(df=None):
+    if df is None:
+        df = get_df()
     try:
-        stream = df.loc[pd.to_datetime('today').normalize().date().isoformat()]["Circuit"]
-        return stream
-    except KeyError:
-        return "NOCIRCUIT"
+        circuit = df[df.index >= datetime.now().date()].iloc[0]["Circuit"]
+    except:
+        circuit = "NOCIRCUIT"
+    return circuit
 
 class MyServer(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -47,18 +47,18 @@ class MyServer(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(
             bytes("<html><head><title>F1 Stream Selector</title></head>", "utf-8"))
-        if self.path == "/stream_today":
-            stream = get_stream_today()
+        if self.path == "/stream_now":
+            stream = get_stream_now()
             self.wfile.write(bytes("<body>", "utf-8"))
             self.wfile.write(bytes(f"<p>{stream}</p>", "utf-8"))
             self.wfile.write(bytes("</body></html>", "utf-8"))
-        elif self.path == "/country_today":
-            country = get_country_today()
+        elif self.path == "/country_upcoming":
+            country = get_country_upcoming()
             self.wfile.write(bytes("<body>", "utf-8"))
             self.wfile.write(bytes(f"<p>{country}</p>", "utf-8"))
             self.wfile.write(bytes("</body></html>", "utf-8"))
-        elif self.path == "/circuit_today":
-            circuit = get_circuit_today()
+        elif self.path == "/circuit_upcoming":
+            circuit = get_circuit_upcoming()
             self.wfile.write(bytes("<body>", "utf-8"))
             self.wfile.write(bytes(f"<p>{circuit}</p>", "utf-8"))
             self.wfile.write(bytes("</body></html>", "utf-8"))
