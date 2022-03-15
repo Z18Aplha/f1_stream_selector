@@ -72,15 +72,21 @@ class MyServer(BaseHTTPRequestHandler):
             self.wfile.write(bytes("<body>", "utf-8"))
             self.wfile.write(bytes(f"<p>{stream}</p>", "utf-8"))
             self.wfile.write(bytes("</body></html>", "utf-8"))
-        elif self.path == "/country_upcoming":
+        elif self.path == "/upcoming_country":
             country = get_country_upcoming()
             self.wfile.write(bytes("<body>", "utf-8"))
             self.wfile.write(bytes(f"<p>{country}</p>", "utf-8"))
             self.wfile.write(bytes("</body></html>", "utf-8"))
-        elif self.path == "/circuit_upcoming":
+        elif self.path == "/upcoming_circuit":
             circuit = get_circuit_upcoming()
             self.wfile.write(bytes("<body>", "utf-8"))
             self.wfile.write(bytes(f"<p>{circuit}</p>", "utf-8"))
+            self.wfile.write(bytes("</body></html>", "utf-8"))
+        elif self.path == "/upcoming_time":
+            df = get_df()
+            time_str = get_time_until_upcoming(df)
+            self.wfile.write(bytes("<body>", "utf-8"))
+            self.wfile.write(bytes(f"<p>{time_str}</p>", "utf-8"))
             self.wfile.write(bytes("</body></html>", "utf-8"))
         elif self.path == "/upcoming_string":
             df = get_df()
