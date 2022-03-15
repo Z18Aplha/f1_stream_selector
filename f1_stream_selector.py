@@ -28,6 +28,18 @@ def get_country_today():
     except KeyError:
         return "NOCOUNTRY"
 
+def get_circuit_today():
+    # load csv
+    df = pd.read_csv("streams.csv", index_col="Date",
+                     parse_dates=True, dayfirst=True)
+    df.index = pd.to_datetime(df.index)
+    # find exact date in df
+    try:
+        stream = df.loc[pd.to_datetime('today').normalize().date().isoformat()]["Circuit"]
+        return stream
+    except KeyError:
+        return "NOCIRCUIT"
+
 class MyServer(BaseHTTPRequestHandler):
     def do_GET(self):
         self.send_response(200)
@@ -44,6 +56,11 @@ class MyServer(BaseHTTPRequestHandler):
             country = get_country_today()
             self.wfile.write(bytes("<body>", "utf-8"))
             self.wfile.write(bytes(f"<p>{country}</p>", "utf-8"))
+            self.wfile.write(bytes("</body></html>", "utf-8"))
+        elif self.path == "/circuit_today":
+            circuit = get_circuit_today()
+            self.wfile.write(bytes("<body>", "utf-8"))
+            self.wfile.write(bytes(f"<p>{circuit}</p>", "utf-8"))
             self.wfile.write(bytes("</body></html>", "utf-8"))
         else:
             self.wfile.write(bytes("<body>", "utf-8"))
