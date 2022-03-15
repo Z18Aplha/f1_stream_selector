@@ -13,6 +13,23 @@ def get_df():
     return df
 
 
+def get_time_until_upcoming(df=None):
+    if df is None:
+        df = get_df()
+    
+    dt = (df[df.index >= datetime.now().date()].iloc[0].name - datetime.now().date())
+    d = dt.days
+    if d == 0:
+        time_str = "heute"
+    elif d == 1:
+        time_str = "morgen"
+    elif d == 2:
+        time_str = "übermorgen"
+    else:
+        time_str = f"in {d} Tagen"
+    
+    return time_str
+
 def get_stream_now(df=None):
     if df is None:
         df = get_df()
@@ -65,6 +82,15 @@ class MyServer(BaseHTTPRequestHandler):
             self.wfile.write(bytes("<body>", "utf-8"))
             self.wfile.write(bytes(f"<p>{circuit}</p>", "utf-8"))
             self.wfile.write(bytes("</body></html>", "utf-8"))
+        elif self.path == "/upcoming_string":
+            df = get_df()
+            country = get_country_upcoming(df)
+            circuit = get_circuit_upcoming(df)
+            time_str = get_time_until_upcoming(df)
+            self.wfile.write(bytes("<body>", "utf-8"))
+            self.wfile.write(bytes(f"<p>Das kommende Rennen findet {time_str} in {circuit}, {country} statt.</p>", "utf-8"))
+            self.wfile.write(bytes("</body></html>", "utf-8"))
+
         else:
             self.wfile.write(bytes("<body>", "utf-8"))
             self.wfile.write(bytes(f"<p>ERROR</p>", "utf-8"))
