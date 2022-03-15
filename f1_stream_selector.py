@@ -24,7 +24,7 @@ def get_time_until_upcoming(df=None):
     elif d == 1:
         time_str = "morgen"
     elif d == 2:
-        time_str = "übermorgen"
+        time_str = "uebermorgen"
     else:
         time_str = f"in {d} Tagen"
     
