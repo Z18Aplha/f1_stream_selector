@@ -15,6 +15,18 @@ def get_stream_today():
         return stream
     except KeyError:
         return "NOSTREAM"
+    
+def get_country_today():
+    # load csv
+    df = pd.read_csv("streams.csv", index_col="Date",
+                     parse_dates=True, dayfirst=True)
+    df.index = pd.to_datetime(df.index)
+    # find exact date in df
+    try:
+        stream = df.loc[pd.to_datetime('today').normalize().date().isoformat()]["Country"]
+        return stream
+    except KeyError:
+        return "NOCOUNTRY"
 
 class MyServer(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -27,6 +39,11 @@ class MyServer(BaseHTTPRequestHandler):
             stream = get_stream_today()
             self.wfile.write(bytes("<body>", "utf-8"))
             self.wfile.write(bytes(f"<p>{stream}</p>", "utf-8"))
+            self.wfile.write(bytes("</body></html>", "utf-8"))
+        if self.path == "/country_today":
+            country = get_stream_today()
+            self.wfile.write(bytes("<body>", "utf-8"))
+            self.wfile.write(bytes(f"<p>{country}</p>", "utf-8"))
             self.wfile.write(bytes("</body></html>", "utf-8"))
         else:
             self.wfile.write(bytes("<body>", "utf-8"))
