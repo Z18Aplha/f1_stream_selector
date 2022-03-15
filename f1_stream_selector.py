@@ -41,7 +41,7 @@ class MyServer(BaseHTTPRequestHandler):
             self.wfile.write(bytes(f"<p>{stream}</p>", "utf-8"))
             self.wfile.write(bytes("</body></html>", "utf-8"))
         elif self.path == "/country_today":
-            country = get_stream_today()
+            country = get_country_today()
             self.wfile.write(bytes("<body>", "utf-8"))
             self.wfile.write(bytes(f"<p>{country}</p>", "utf-8"))
             self.wfile.write(bytes("</body></html>", "utf-8"))
