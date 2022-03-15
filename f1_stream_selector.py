@@ -10,8 +10,7 @@ def get_stream_today():
                      parse_dates=True, dayfirst=True)
     df.index = pd.to_datetime(df.index)
     # find exact date in df
-    stream = df.loc[pd.to_datetime('today').normalize(
-    ).date().isoformat()]["Stream"].to_list()
+    stream = df.loc[pd.to_datetime('today').normalize().date().isoformat()]["Stream"].to_list()
     if len(stream):
         return stream[0]
     else:
