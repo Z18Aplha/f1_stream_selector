@@ -2,7 +2,7 @@ import pandas as pd
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import time
 import yaml
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 def get_df():
@@ -30,11 +30,11 @@ def get_time_until_upcoming(df=None):
     
     return time_str
 
-def get_stream_now(df=None):
+def get_stream_weekend(df=None):
     if df is None:
         df = get_df()
 
-    stream = df[df.index == datetime.now().date()]["Stream"]
+    stream = df[(df.index - datetime.now().date()) <= timedelta(days=2)]["Stream"]
     if not len(stream):
         stream = "NOSTREAM"
     else:
@@ -68,7 +68,7 @@ class MyServer(BaseHTTPRequestHandler):
         self.wfile.write(
             bytes("<html><head><title>F1 Stream Selector</title></head>", "utf-8"))
         if self.path == "/stream_now":
-            stream = get_stream_now()
+            stream = get_stream_weekend()
             self.wfile.write(bytes("<body>", "utf-8"))
             self.wfile.write(bytes(f"<p>{stream}</p>", "utf-8"))
             self.wfile.write(bytes("</body></html>", "utf-8"))
@@ -88,14 +88,14 @@ class MyServer(BaseHTTPRequestHandler):
             self.wfile.write(bytes("<body>", "utf-8"))
             self.wfile.write(bytes(f"<p>{time_str}</p>", "utf-8"))
             self.wfile.write(bytes("</body></html>", "utf-8"))
-        elif self.path == "/upcoming_string":
-            df = get_df()
-            country = get_country_upcoming(df)
-            circuit = get_circuit_upcoming(df)
-            time_str = get_time_until_upcoming(df)
-            self.wfile.write(bytes("<body>", "utf-8"))
-            self.wfile.write(bytes(f"<p>Das kommende Rennen findet {time_str} in {country} statt.</p>", "utf-8"))
-            self.wfile.write(bytes("</body></html>", "utf-8"))
+        # elif self.path == "/upcoming_string":
+        #     df = get_df()
+        #     country = get_country_upcoming(df)
+        #     circuit = get_circuit_upcoming(df)
+        #     time_str = get_time_until_upcoming(df)
+        #     self.wfile.write(bytes("<body>", "utf-8"))
+        #     self.wfile.write(bytes(f"<p>Das kommende Rennen findet {time_str} in {country} statt.</p>", "utf-8"))
+        #     self.wfile.write(bytes("</body></html>", "utf-8"))
 
         else:
             self.wfile.write(bytes("<body>", "utf-8"))
